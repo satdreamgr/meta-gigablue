@@ -52,27 +52,25 @@ MACHINE_FEATURES += "3dtv alsa hdmicec switchoff bootsplash kernelwifi"
 
 BOOTLOGO_FILENAME = "splash.bin"
 
-
-
+IMGDEPLOYDIR ?= "${DEPLOY_DIR_IMAGE}"
 IMAGEVERSION := "${DISTRO_NAME}-${DISTRO_VERSION}-${DATE}"
 IMAGEVERSION[vardepsexclude] = "DATE"
-
-IMAGE_CMD_ubi_append = " \
-    mkdir -p ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}; \
-    cp ${DEPLOY_DIR_IMAGE}/lcd*.bin ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}; \
-    cp ${DEPLOY_DIR_IMAGE}/splash.bin ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}; \
-    cp ${DEPLOY_DIR_IMAGE}/warning.bin ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}; \
-    mv ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.ubi ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}/${ROOTFS_FILE}; \
-    gzip -f -c ${DEPLOY_DIR_IMAGE}/vmlinux-${MACHINE}.bin > ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}/${KERNEL_FILE}; \
-    echo ${IMAGEVERSION} > ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}/imageversion; \
-    echo "rename this file to 'force' to force an update without confirmation" > ${DEPLOY_DIR_IMAGE}/${IMAGEDIR}/noforce; \
-    cd ${DEPLOY_DIR_IMAGE}; \
-    zip -r ${DISTRO_NAME}-${DISTRO_VERSION}-${MACHINE}_usb.zip ${IMAGEDIR}/*; \
-    rm -Rf ${IMAGEDIR}; \
-    "
 
 IMAGE_CMD_ubi_prepend = " \
     rm -rf ${IMAGE_ROOTFS}/boot/*; \
     rm -rf ${IMAGE_ROOTFS}/tmp/*; \
     "
 
+IMAGE_CMD_ubi_append = " \
+    mkdir -p ${IMGDEPLOYDIR}/${IMAGEDIR}; \
+    cp ${DEPLOY_DIR_IMAGE}/lcd*.bin ${IMGDEPLOYDIR}/${IMAGEDIR}; \
+    cp ${DEPLOY_DIR_IMAGE}/splash.bin ${IMGDEPLOYDIR}/${IMAGEDIR}; \
+    cp ${DEPLOY_DIR_IMAGE}/warning.bin ${IMGDEPLOYDIR}/${IMAGEDIR}; \
+    mv ${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.ubi ${IMGDEPLOYDIR}/${IMAGEDIR}/${ROOTFS_FILE}; \
+    gzip -f -c ${DEPLOY_DIR_IMAGE}/vmlinux-${MACHINE}.bin > ${IMGDEPLOYDIR}/${IMAGEDIR}/${KERNEL_FILE}; \
+    echo ${IMAGEVERSION} > ${IMGDEPLOYDIR}/${IMAGEDIR}/imageversion; \
+    echo "rename this file to 'force' to force an update without confirmation" > ${IMGDEPLOYDIR}/${IMAGEDIR}/noforce; \
+    cd ${IMGDEPLOYDIR}; \
+    zip -r ${DISTRO_NAME}-${DISTRO_VERSION}-${MACHINE}_usb.zip ${IMAGEDIR}/*; \
+    rm -rf ${IMAGEDIR}; \
+    "
